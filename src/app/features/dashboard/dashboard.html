@@ -1,1 +1,191 @@
-<p>dashboard works!</p>
+<div class="dashboard-layout">
+
+  <!-- ── Sidebar ─────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <mat-icon>business</mat-icon>
+      <span>RRHH</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item active" routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" routerLink="/sucursales">
+        <mat-icon>store</mat-icon>
+        <span>Sucursales</span>
+      </a>
+      <a class="nav-item" routerLink="/empleados">
+        <mat-icon>search</mat-icon>
+        <span>Búsqueda</span>
+      </a>
+      <a class="nav-item" routerLink="/empleados">
+        <mat-icon>people</mat-icon>
+        <span>Empleados</span>
+      </a>
+      <a class="nav-item" routerLink="/incidencias">
+        <mat-icon>warning</mat-icon>
+        <span>Incidencias</span>
+      </a>
+      <a class="nav-item" routerLink="/salidas">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Salidas</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="usuario-info">
+        <div class="avatar-usuario">
+          {{ getIniciales(usuario?.nombre || 'U') }}
+        </div>
+        <div>
+          <div class="usuario-nombre">{{ usuario?.nombre }}</div>
+          <div class="usuario-rol">{{ usuario?.rol?.replace('_', ' ') }}</div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="logout()" title="Cerrar sesión">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Contenido principal ────────────────────── -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <div class="topbar">
+      <div class="sucursal-selector">
+        <mat-icon>store</mat-icon>
+        <select (change)="filtrarPorSucursal($any($event.target).value || null)"
+                class="select-sucursal">
+          <option value="">Todas las Sucursales</option>
+          @for (s of sucursales; track s.idSucursal) {
+            <option [value]="s.idSucursal">{{ s.nombre }}</option>
+          }
+        </select>
+        <mat-icon>expand_more</mat-icon>
+      </div>
+    </div>
+
+    <!-- Título -->
+    <h1 class="page-title">Dashboard</h1>
+
+    @if (cargando) {
+      <div class="cargando">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Cargando datos...</p>
+      </div>
+    }
+
+    @if (!cargando) {
+
+      <!-- ── 5 Tarjetas de stats ─────────────────── -->
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Total Empleados</div>
+            <div class="stat-valor">{{ stats.totalEmpleados }}</div>
+            <div class="stat-sub">{{ stats.activosHoy }} activos</div>
+          </div>
+          <div class="stat-icono azul">
+            <mat-icon>people</mat-icon>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Activos Hoy</div>
+            <div class="stat-valor">{{ stats.activosHoy }}</div>
+            <div class="stat-sub">{{ stats.totalEmpleados - stats.activosHoy }} con permiso/inactivo</div>
+          </div>
+          <div class="stat-icono verde">
+            <mat-icon>person_check</mat-icon>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Incidencias este mes</div>
+            <div class="stat-valor">{{ stats.incidenciasEsteMes }}</div>
+            <div class="stat-sub">requieren seguimiento</div>
+          </div>
+          <div class="stat-icono naranja">
+            <mat-icon>warning</mat-icon>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Incidentes por resolver</div>
+            <div class="stat-valor">{{ stats.incidentesPorResolver }}</div>
+            <div class="stat-sub">Requieren intervención</div>
+          </div>
+          <div class="stat-icono rojo">
+            <mat-icon>report_problem</mat-icon>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <div class="stat-label">Documentos pendientes</div>
+            <div class="stat-valor">{{ stats.documentosPendientes }}</div>
+            <div class="stat-sub">Por clasificar</div>
+          </div>
+          <div class="stat-icono morado">
+            <mat-icon>folder_open</mat-icon>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Sección inferior ───────────────────── -->
+      <div class="bottom-grid">
+
+        <!-- Actividad Reciente -->
+        <div class="card">
+          <h3 class="card-titulo">Actividad Reciente</h3>
+          <div class="actividad-lista">
+            @for (item of actividadReciente; track $index) {
+              <div class="actividad-item">
+                <div class="actividad-avatar">{{ item.iniciales }}</div>
+                <div class="actividad-info">
+                  <span class="actividad-nombre">{{ item.nombreCompleto }}</span>
+                  <span class="actividad-accion"> — {{ item.accion }} — </span>
+                  <span class="actividad-tiempo">{{ item.tiempoRelativo }}</span>
+                </div>
+              </div>
+            }
+            @if (actividadReciente.length === 0) {
+              <p class="sin-datos">Sin actividad reciente</p>
+            }
+          </div>
+        </div>
+
+        <!-- Próximos contratos a vencer -->
+        <div class="card">
+          <h3 class="card-titulo">Próximos contratos a vencer</h3>
+          <div class="contratos-lista">
+            @for (contrato of proximosContratos; track $index) {
+              <div class="contrato-item" (click)="irAExpediente(contrato.dni)">
+                <span class="contrato-nombre">{{ contrato.nombreCompleto }}</span>
+                <span class="contrato-dias"
+                      [style.background]="getColorAlerta(contrato.colorAlerta)">
+                  {{ contrato.diasRestantes }} días
+                </span>
+              </div>
+            }
+            @if (proximosContratos.length === 0) {
+              <p class="sin-datos">Sin contratos próximos a vencer</p>
+            }
+          </div>
+        </div>
+
+      </div>
+
+    }
+
+  </main>
+
+</div>

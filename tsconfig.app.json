@@ -3,7 +3,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "./out-tsc/app",
+   //N "outDir": "./out-tsc/app",
     "types": []
   },
   "include": [

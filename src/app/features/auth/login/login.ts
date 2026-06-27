@@ -2,13 +2,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Auth } from '../../../core/services/auth';
+import { HttpClient } from '@angular/common/http';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -20,11 +20,11 @@ import { MatSelectModule } from '@angular/material/select';
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
-    MatSnackBarModule,
-    MatSelectModule
+    MatSelectModule,
+    MatSnackBarModule
   ],
   templateUrl: './login.html',
-  styleUrls: ['./login.css']
+  styleUrl: './login.css'
 })
 export class Login {
 
@@ -35,10 +35,10 @@ export class Login {
   modoRegistro = false;
 
   constructor(
-     private fb: FormBuilder,
-     private authService: Auth,
-     private router: Router,
-     private snackBar: MatSnackBar
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -57,38 +57,52 @@ export class Login {
     if (this.loginForm.invalid) return;
     this.cargando = true;
 
-    this.authService.login(this.loginForm.value).subscribe({
-      next: () => {
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        this.cargando = false;
-        this.snackBar.open(
-          err.error?.mensaje || 'Credenciales incorrectas',
-          'Cerrar',
-          { duration: 3000 }
-        );
-      }
-    });
+    this.http.post<any>('http://localhost:8080/api/v1/auth/login', this.loginForm.value)
+      .subscribe({
+        next: (response) => {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('usuario', JSON.stringify({
+            nombre: response.nombre,
+            email: response.email,
+            rol: response.rol
+          }));
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          this.cargando = false;
+          this.snackBar.open(
+            err.error?.mensaje || 'Credenciales incorrectas',
+            'Cerrar',
+            { duration: 3000 }
+          );
+        }
+      });
   }
 
   registrar(): void {
     if (this.registerForm.invalid) return;
     this.cargando = true;
 
-    this.authService.register(this.registerForm.value).subscribe({
-      next: () => {
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        this.cargando = false;
-        this.snackBar.open(
-          err.error?.mensaje || 'Error al registrar',
-          'Cerrar',
-          { duration: 3000 }
-        );
-      }
-    });
+    this.http.post<any>('http://localhost:8080/api/v1/auth/register', this.registerForm.value)
+      .subscribe({
+        next: (response) => {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('usuario', JSON.stringify({
+            nombre: response.nombre,
+            email: response.email,
+            rol: response.rol
+          }));
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          this.cargando = false;
+          this.snackBar.open(
+            err.error?.mensaje || 'Error al registrar',
+            'Cerrar',
+            { duration: 3000 }
+          );
+        }
+      });
   }
 
   toggleModo(): void {

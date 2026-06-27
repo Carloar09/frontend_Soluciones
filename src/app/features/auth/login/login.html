@@ -21,16 +21,12 @@
 
       @if (!modoRegistro) {
         <form [formGroup]="loginForm" (ngSubmit)="login()">
-
           <mat-form-field appearance="outline" class="campo-completo">
             <mat-label>Email</mat-label>
             <mat-icon matPrefix>email</mat-icon>
             <input matInput type="email" formControlName="email">
             @if (loginForm.get('email')?.hasError('required')) {
               <mat-error>El email es obligatorio</mat-error>
-            }
-            @if (loginForm.get('email')?.hasError('email')) {
-              <mat-error>Email inválido</mat-error>
             }
           </mat-form-field>
 
@@ -39,30 +35,24 @@
             <mat-icon matPrefix>lock</mat-icon>
             <input matInput [type]="mostrarPassword ? 'text' : 'password'"
                    formControlName="password">
-            <button mat-icon-button matSuffix type="button"
-                    (click)="togglePassword()">
+            <button mat-icon-button matSuffix type="button" (click)="togglePassword()">
               <mat-icon>{{ mostrarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </mat-form-field>
 
           <div class="links-row">
             <a class="link-secundario">¿Olvidaste tu contraseña?</a>
-            <a (click)="toggleModo()" class="link-secundario link-registro">
-              Registrarse
-            </a>
+            <a (click)="toggleModo()" class="link-secundario link-registro">Registrarse</a>
           </div>
 
-          <button mat-raised-button class="btn-login"
-                  type="submit" [disabled]="cargando">
+          <button mat-raised-button class="btn-login" type="submit" [disabled]="cargando">
             {{ cargando ? 'Ingresando...' : 'LOGIN' }}
           </button>
-
         </form>
       }
 
       @if (modoRegistro) {
         <form [formGroup]="registerForm" (ngSubmit)="registrar()">
-
           <mat-form-field appearance="outline" class="campo-completo">
             <mat-label>Nombre completo</mat-label>
             <mat-icon matPrefix>person</mat-icon>
@@ -80,8 +70,7 @@
             <mat-icon matPrefix>lock</mat-icon>
             <input matInput [type]="mostrarPassword ? 'text' : 'password'"
                    formControlName="password">
-            <button mat-icon-button matSuffix type="button"
-                    (click)="togglePassword()">
+            <button mat-icon-button matSuffix type="button" (click)="togglePassword()">
               <mat-icon>{{ mostrarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </mat-form-field>
@@ -97,20 +86,15 @@
           </mat-form-field>
 
           <div class="links-row">
-            <a (click)="toggleModo()" class="link-secundario">
-              ¿Ya tienes cuenta? Inicia sesión
-            </a>
+            <a (click)="toggleModo()" class="link-secundario">¿Ya tienes cuenta? Inicia sesión</a>
           </div>
 
-          <button mat-raised-button class="btn-login"
-                  type="submit" [disabled]="cargando">
+          <button mat-raised-button class="btn-login" type="submit" [disabled]="cargando">
             {{ cargando ? 'Registrando...' : 'REGISTRARSE' }}
           </button>
-
         </form>
       }
 
     </div>
   </div>
-
 </div>

@@ -1,0 +1,323 @@
+/* ── Layout general ─────────────────────────────── */
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+  background: #f8f9fa;
+}
+
+/* ── Sidebar ─────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: #1a1f3a;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 20px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar-logo mat-icon {
+  color: #6366f1;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: rgba(99, 102, 241, 0.15);
+  color: white;
+  border-left: 3px solid #6366f1;
+}
+
+.nav-item mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.usuario-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-usuario {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.usuario-nombre {
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.usuario-rol {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.75rem;
+}
+
+.sidebar-footer button {
+  color: rgba(255,255,255,0.5);
+}
+
+/* ── Contenido principal ─────────────────────────── */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* ── Topbar ──────────────────────────────────────── */
+.topbar {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+}
+
+.sucursal-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a1f3a;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sucursal-selector mat-icon {
+  font-size: 18px;
+  color: rgba(255,255,255,0.7);
+}
+
+.select-sucursal {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.select-sucursal option {
+  background: #1a1f3a;
+  color: white;
+}
+
+/* ── Título ──────────────────────────────────────── */
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1a1f3a;
+  margin-bottom: 20px;
+}
+
+/* ── Cargando ────────────────────────────────────── */
+.cargando {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #6b7280;
+}
+
+/* ── Grid de stats ───────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.stat-valor {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1f3a;
+}
+
+.stat-sub {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+.stat-icono {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icono mat-icon { color: white; }
+.stat-icono.azul    { background: #3b82f6; }
+.stat-icono.verde   { background: #22c55e; }
+.stat-icono.naranja { background: #f97316; }
+.stat-icono.rojo    { background: #ef4444; }
+.stat-icono.morado  { background: #8b5cf6; }
+
+/* ── Grid inferior ───────────────────────────────── */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.card-titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1f3a;
+  margin-bottom: 16px;
+}
+
+/* ── Actividad reciente ──────────────────────────── */
+.actividad-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.actividad-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.actividad-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.actividad-nombre { font-weight: 600; font-size: 0.85rem; color: #1a1f3a; }
+.actividad-accion { font-size: 0.85rem; color: #6b7280; }
+.actividad-tiempo { font-size: 0.8rem; color: #9ca3af; }
+
+/* ── Contratos por vencer ────────────────────────── */
+.contratos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contrato-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+}
+
+.contrato-item:hover { background: #f9fafb; }
+
+.contrato-nombre {
+  font-size: 0.88rem;
+  color: #374151;
+}
+
+.contrato-dias {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: white;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.sin-datos {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 1200px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .bottom-grid { grid-template-columns: 1fr; }
+}

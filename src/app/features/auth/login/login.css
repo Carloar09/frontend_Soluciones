@@ -142,11 +142,6 @@
 }
 
 @media (max-width: 768px) {
-  .panel-izquierdo {
-    display: none;
-  }
-  .panel-derecho {
-    width: 100%;
-    padding: 20px;
-  }
+  .panel-izquierdo { display: none; }
+  .panel-derecho { width: 100%; padding: 20px; }
 }
