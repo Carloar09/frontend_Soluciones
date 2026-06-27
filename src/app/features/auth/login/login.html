@@ -1,0 +1,116 @@
+<div class="login-container">
+
+  <div class="panel-izquierdo">
+    <div class="forma-1"></div>
+    <div class="forma-2"></div>
+    <div class="forma-3"></div>
+    <div class="texto-panel">
+      <h1>Sistema RRHH</h1>
+      <p>Gestión de Recursos Humanos</p>
+    </div>
+  </div>
+
+  <div class="panel-derecho">
+    <div class="card-login">
+
+      <div class="icono-usuario">
+        <mat-icon>account_circle</mat-icon>
+      </div>
+
+      <h2>{{ modoRegistro ? 'REGISTRARSE' : 'LOGIN' }}</h2>
+
+      @if (!modoRegistro) {
+        <form [formGroup]="loginForm" (ngSubmit)="login()">
+
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>Email</mat-label>
+            <mat-icon matPrefix>email</mat-icon>
+            <input matInput type="email" formControlName="email">
+            @if (loginForm.get('email')?.hasError('required')) {
+              <mat-error>El email es obligatorio</mat-error>
+            }
+            @if (loginForm.get('email')?.hasError('email')) {
+              <mat-error>Email inválido</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>Contraseña</mat-label>
+            <mat-icon matPrefix>lock</mat-icon>
+            <input matInput [type]="mostrarPassword ? 'text' : 'password'"
+                   formControlName="password">
+            <button mat-icon-button matSuffix type="button"
+                    (click)="togglePassword()">
+              <mat-icon>{{ mostrarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </mat-form-field>
+
+          <div class="links-row">
+            <a class="link-secundario">¿Olvidaste tu contraseña?</a>
+            <a (click)="toggleModo()" class="link-secundario link-registro">
+              Registrarse
+            </a>
+          </div>
+
+          <button mat-raised-button class="btn-login"
+                  type="submit" [disabled]="cargando">
+            {{ cargando ? 'Ingresando...' : 'LOGIN' }}
+          </button>
+
+        </form>
+      }
+
+      @if (modoRegistro) {
+        <form [formGroup]="registerForm" (ngSubmit)="registrar()">
+
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>Nombre completo</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input matInput formControlName="nombre">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>Email</mat-label>
+            <mat-icon matPrefix>email</mat-icon>
+            <input matInput type="email" formControlName="email">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>Contraseña</mat-label>
+            <mat-icon matPrefix>lock</mat-icon>
+            <input matInput [type]="mostrarPassword ? 'text' : 'password'"
+                   formControlName="password">
+            <button mat-icon-button matSuffix type="button"
+                    (click)="togglePassword()">
+              <mat-icon>{{ mostrarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="campo-completo">
+            <mat-label>Rol</mat-label>
+            <mat-icon matPrefix>badge</mat-icon>
+            <mat-select formControlName="rol">
+              <mat-option value="RECURSOS_HUMANOS">Recursos Humanos</mat-option>
+              <mat-option value="CONTABILIDAD">Contabilidad</mat-option>
+              <mat-option value="GERENTE">Gerente</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="links-row">
+            <a (click)="toggleModo()" class="link-secundario">
+              ¿Ya tienes cuenta? Inicia sesión
+            </a>
+          </div>
+
+          <button mat-raised-button class="btn-login"
+                  type="submit" [disabled]="cargando">
+            {{ cargando ? 'Registrando...' : 'REGISTRARSE' }}
+          </button>
+
+        </form>
+      }
+
+    </div>
+  </div>
+
+</div>
