@@ -1,1 +1,125 @@
-<p>sucursales works!</p>
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <mat-icon>business</mat-icon>
+      <span>RRHH</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item" routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item active" routerLink="/sucursales">
+        <mat-icon>store</mat-icon>
+        <span>Sucursales</span>
+      </a>
+      <a class="nav-item" routerLink="/empleados">
+        <mat-icon>people</mat-icon>
+        <span>Empleados</span>
+      </a>
+      <a class="nav-item" routerLink="/incidencias">
+        <mat-icon>warning</mat-icon>
+        <span>Incidencias</span>
+      </a>
+      <a class="nav-item" routerLink="/salidas">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Salidas</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="usuario-info">
+        <div class="avatar-usuario">
+          {{ getIniciales(usuario?.nombre || 'U') }}
+        </div>
+        <div>
+          <div class="usuario-nombre">{{ usuario?.nombre }}</div>
+          <div class="usuario-rol">{{ usuario?.rol?.replace('_', ' ') }}</div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido -->
+  <main class="main-content">
+
+    <h1 class="page-title">Sucursales</h1>
+
+    @if (cargando) {
+      <div class="cargando">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Cargando sucursales...</p>
+      </div>
+    }
+
+    @if (!cargando) {
+      <div class="sucursales-grid">
+        @for (s of sucursales; track s.idSucursal) {
+          <div class="sucursal-card">
+
+            <div class="sucursal-header">
+              <div>
+                <h3 class="sucursal-nombre">{{ s.nombre }}</h3>
+                <div class="sucursal-estado">
+                  <span class="punto-verde"></span>
+                  Operativa
+                </div>
+              </div>
+              <span class="badge-empleados">
+                {{ s.totalEmpleados || 0 }} empleados
+              </span>
+            </div>
+
+            <div class="sucursal-info">
+              <div class="info-row">
+                <mat-icon>location_on</mat-icon>
+                <span>{{ s.ubicacion }}</span>
+              </div>
+              @if (s.encargadoNombre) {
+                <div class="info-row">
+                  <mat-icon>person</mat-icon>
+                  <span>{{ s.encargadoNombre }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="sucursal-stats">
+              <div class="mini-stat">
+                <span class="mini-valor">{{ s.activos || 0 }}</span>
+                <span class="mini-label">Activos</span>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-valor">{{ s.incidencias || 0 }}</span>
+                <span class="mini-label">Incidencias</span>
+              </div>
+              <div class="mini-stat">
+                <span class="mini-valor">{{ s.docsPendientes || 0 }}</span>
+                <span class="mini-label">Docs pend.</span>
+              </div>
+            </div>
+
+            <button mat-raised-button class="btn-gestionar"
+                    (click)="irAEmpleados(s.idSucursal)">
+              Gestionar
+            </button>
+
+          </div>
+        }
+
+        @if (sucursales.length === 0) {
+          <div class="sin-datos">
+            <mat-icon>store_mall_directory</mat-icon>
+            <p>No hay sucursales registradas</p>
+          </div>
+        }
+      </div>
+    }
+
+  </main>
+</div>

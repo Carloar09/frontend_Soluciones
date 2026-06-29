@@ -1,1 +1,166 @@
-<p>lista-empleados works!</p>
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <mat-icon>business</mat-icon>
+      <span>RRHH</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon><span>Dashboard</span>
+      </a>
+      <a class="nav-item" routerLink="/sucursales">
+        <mat-icon>store</mat-icon><span>Sucursales</span>
+      </a>
+      <a class="nav-item active" routerLink="/empleados">
+        <mat-icon>people</mat-icon><span>Empleados</span>
+      </a>
+      <a class="nav-item" routerLink="/incidencias">
+        <mat-icon>warning</mat-icon><span>Incidencias</span>
+      </a>
+      <a class="nav-item" routerLink="/salidas">
+        <mat-icon>exit_to_app</mat-icon><span>Salidas</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="usuario-info">
+        <div class="avatar-usuario">{{ getIniciales(usuario?.nombre || 'U') }}</div>
+        <div>
+          <div class="usuario-nombre">{{ usuario?.nombre }}</div>
+          <div class="usuario-rol">{{ usuario?.rol?.replace('_', ' ') }}</div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido -->
+  <main class="main-content">
+
+    <!-- Header con filtro de sucursal -->
+    <div class="topbar">
+      <div class="sucursal-selector">
+        <mat-icon>store</mat-icon>
+        <select (change)="filtrarPorSucursal($event)" class="select-sucursal">
+          <option value="">Todas las Sucursales</option>
+          @for (s of sucursales; track s.idSucursal) {
+            <option [value]="s.idSucursal"
+                    [selected]="s.idSucursal == sucursalId">
+              {{ s.nombre }}
+            </option>
+          }
+        </select>
+        <mat-icon>expand_more</mat-icon>
+      </div>
+    </div>
+
+    <!-- Título y botón nuevo -->
+    <div class="page-header">
+      <h1 class="page-title">
+        {{ empleadosFiltrados.length }} empleados registrados
+      </h1>
+      <button mat-raised-button class="btn-nuevo" (click)="nuevoEmpleado()">
+        <mat-icon>add</mat-icon>
+        Nuevo Empleado
+      </button>
+    </div>
+
+    <!-- Filtros de estado -->
+    <div class="filtros">
+      <button [class.activo]="filtroEstado === 'TODOS'"
+              (click)="filtroEstado = 'TODOS'; aplicarFiltro()">
+        Todos
+      </button>
+      <button [class.activo]="filtroEstado === 'ACTIVO'"
+              (click)="filtroEstado = 'ACTIVO'; aplicarFiltro()">
+        Activos
+      </button>
+      <button [class.activo]="filtroEstado === 'INACTIVO'"
+              (click)="filtroEstado = 'INACTIVO'; aplicarFiltro()">
+        Inactivos
+      </button>
+    </div>
+
+    @if (cargando) {
+      <div class="cargando">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Cargando empleados...</p>
+      </div>
+    }
+
+    @if (!cargando) {
+      <div class="tabla-container">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>AVATAR + NOMBRE</th>
+              <th>DNI</th>
+              <th>ÁREA</th>
+              <th>SUCURSAL</th>
+              <th>CARGO</th>
+              <th>FECHA INGRESO</th>
+              <th>ESTADO</th>
+              <th>CONTRATO VENCE</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (emp of empleadosFiltrados; track emp.id) {
+              <tr (click)="irAExpediente(emp.dni)" class="fila-empleado">
+                <td>
+                  <div class="empleado-nombre-col">
+                    <div class="avatar-tabla">{{ getIniciales(emp.nombreCompleto) }}</div>
+                    <span>{{ emp.nombreCompleto }}</span>
+                  </div>
+                </td>
+                <td>{{ emp.dni }}</td>
+                <td>{{ emp.area || '—' }}</td>
+                <td>
+                  <span class="badge-sucursal">{{ emp.sucursalNombre || '—' }}</span>
+                </td>
+                <td>{{ emp.cargo || '—' }}</td>
+                <td>{{ emp.fechaIngreso || '—' }}</td>
+                <td>
+                  <div class="estado-badge">
+                    <span class="punto-estado"
+                          [style.background]="getColorEstado(emp.estado)">
+                    </span>
+                    <span [style.color]="getColorEstado(emp.estado)">
+                      {{ emp.estado?.replace('_', ' ') }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  @if (emp.fechaVencimiento) {
+                    <span class="dias-badge"
+                          [style.background]="getColorDias(getDiasRestantes(emp.fechaVencimiento))">
+                      {{ getDiasRestantes(emp.fechaVencimiento) }} días
+                    </span>
+                  } @else {
+                    <span>—</span>
+                  }
+                </td>
+                <td>
+                  <button mat-icon-button (click)="irAExpediente(emp.dni); $event.stopPropagation()">
+                    <mat-icon>more_horiz</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (empleadosFiltrados.length === 0) {
+          <div class="sin-datos">
+            <mat-icon>people_outline</mat-icon>
+            <p>No hay empleados registrados</p>
+          </div>
+        }
+      </div>
+    }
+
+  </main>
+</div>
