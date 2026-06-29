@@ -1,1 +1,335 @@
-<p>expediente works!</p>
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <mat-icon>business</mat-icon>
+      <span>RRHH</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon><span>Dashboard</span>
+      </a>
+      <a class="nav-item" routerLink="/sucursales">
+        <mat-icon>store</mat-icon><span>Sucursales</span>
+      </a>
+      <a class="nav-item active" routerLink="/empleados">
+        <mat-icon>people</mat-icon><span>Empleados</span>
+      </a>
+      <a class="nav-item" routerLink="/incidencias">
+        <mat-icon>warning</mat-icon><span>Incidencias</span>
+      </a>
+      <a class="nav-item" routerLink="/salidas">
+        <mat-icon>exit_to_app</mat-icon><span>Salidas</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="usuario-info">
+        <div class="avatar-usuario">{{ getIniciales(usuario?.nombre || 'U') }}</div>
+        <div>
+          <div class="usuario-nombre">{{ usuario?.nombre }}</div>
+          <div class="usuario-rol">{{ usuario?.rol?.replace('_', ' ') }}</div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido -->
+  <main class="main-content">
+
+    <div class="back-btn" (click)="volver()">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Volver a Empleados</span>
+    </div>
+
+    <h1 class="page-title">Expediente</h1>
+
+    @if (cargando) {
+      <div class="cargando">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Cargando expediente...</p>
+      </div>
+    }
+
+    @if (!cargando && empleado) {
+      <div class="expediente-layout">
+
+        <!-- Panel izquierdo — Tabs -->
+        <div class="panel-principal">
+          <mat-tab-group>
+
+            <!-- Tab 1: Documentos -->
+            <mat-tab label="Documentos">
+              <div class="tab-content">
+
+                <!-- Checklist -->
+                <div class="checklist">
+                  <div class="check-item" [class.check-ok]="empleado.hasDni">
+                    <mat-icon>{{ empleado.hasDni ? 'check' : 'close' }}</mat-icon>
+                    <span>DNI (copia)</span>
+                  </div>
+                  <div class="check-item" [class.check-ok]="empleado.hasAntecedentes">
+                    <mat-icon>{{ empleado.hasAntecedentes ? 'check' : 'close' }}</mat-icon>
+                    <span>Antecedentes policiales</span>
+                  </div>
+                  <div class="check-item" [class.check-ok]="empleado.hasContrato">
+                    <mat-icon>{{ empleado.hasContrato ? 'check' : 'close' }}</mat-icon>
+                    <span>Contrato firmado</span>
+                  </div>
+                  <div class="check-item" [class.check-ok]="empleado.hasCertificado">
+                    <mat-icon>{{ empleado.hasCertificado ? 'check' : 'close' }}</mat-icon>
+                    <span>Certificado de estudios</span>
+                  </div>
+                  <div class="check-item" [class.check-ok]="empleado.hasBoleta">
+                    <mat-icon>{{ empleado.hasBoleta ? 'check' : 'close' }}</mat-icon>
+                    <span>Boletas de pago</span>
+                  </div>
+                </div>
+
+                <!-- Subir documento -->
+                <div class="subir-doc">
+                  <div class="upload-area">
+                    <mat-icon>cloud_upload</mat-icon>
+                    <p>Arrastra un documento aquí o haz clic para subir</p>
+                    <small>PDF, JPG o PNG · máx. 10 MB</small>
+                    <input type="file" (change)="onArchivoSeleccionado($event)"
+                           accept=".pdf,.jpg,.jpeg,.png" #fileInput hidden>
+                    <button mat-stroked-button (click)="fileInput.click()">
+                      Seleccionar archivo
+                    </button>
+                    @if (archivoSeleccionado) {
+                      <p class="archivo-nombre">{{ archivoSeleccionado.name }}</p>
+                    }
+                  </div>
+
+                  <div class="subir-row">
+                    <select [(ngModel)]="tipoDocumento" class="select-tipo">
+                      <option value="DNI">DNI</option>
+                      <option value="ANTECEDENTES">Antecedentes</option>
+                      <option value="CONTRATO">Contrato</option>
+                      <option value="CERTIFICADO">Certificado</option>
+                      <option value="BOLETA_PAGO">Boleta de pago</option>
+                      <option value="MEMORANDUM">Memorándum</option>
+                    </select>
+                    <button mat-raised-button class="btn-subir"
+                            (click)="subirDocumento()"
+                            [disabled]="!archivoSeleccionado || subiendoDoc">
+                      {{ subiendoDoc ? 'Subiendo...' : 'Subir' }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Lista de documentos -->
+                <div class="docs-filtro">
+                  <select [(ngModel)]="filtroTipoDoc" class="select-tipo">
+                    <option value="">Todos los tipos</option>
+                    <option value="DNI">DNI</option>
+                    <option value="ANTECEDENTES">Antecedentes</option>
+                    <option value="CONTRATO">Contrato</option>
+                    <option value="CERTIFICADO">Certificado</option>
+                    <option value="BOLETA_PAGO">Boleta</option>
+                    <option value="MEMORANDUM">Memorándum</option>
+                  </select>
+                </div>
+
+                <div class="docs-grid">
+                  @for (doc of documentosFiltrados; track doc.id_Documento) {
+                    <div class="doc-card">
+                      <mat-icon class="doc-icono">description</mat-icon>
+                      <div class="doc-info">
+                        <span class="doc-nombre">{{ doc.nombreArchivo }}</span>
+                        <span class="doc-tipo-badge">{{ doc.tipoDocumento }}</span>
+                        <span class="doc-fecha">{{ doc.fechaSubida | date:'dd MMM yyyy' }}</span>
+                      </div>
+                      <div class="doc-acciones">
+                        <button mat-icon-button title="Descargar"
+                                (click)="descargarDocumento(doc.id_Documento, doc.nombreArchivo)">
+                          <mat-icon>download</mat-icon>
+                        </button>
+                        <button mat-icon-button title="Eliminar" color="warn"
+                                (click)="eliminarDocumento(doc.id_Documento)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                  @if (documentosFiltrados.length === 0) {
+                    <p class="sin-docs">Sin documentos</p>
+                  }
+                </div>
+
+              </div>
+            </mat-tab>
+
+            <!-- Tab 2: Historial Laboral -->
+            <mat-tab label="Historial Laboral">
+              <div class="tab-content">
+                @for (c of empleado.contratos || []; track $index) {
+                  <div class="historial-item">
+                    <div class="historial-titulo">{{ c.sucursalNombre }}</div>
+                    <div class="historial-sub">
+                      {{ c.cargo }} · {{ c.fechaIngreso }} - {{ c.fechaVencimiento || 'Actualidad' }}
+                    </div>
+                  </div>
+                }
+                @if (!empleado.contratos || empleado.contratos.length === 0) {
+                  <p class="sin-docs">Sin historial laboral</p>
+                }
+              </div>
+            </mat-tab>
+
+            <!-- Tab 3: Historial de incidentes -->
+            <mat-tab label="Historial de incidentes">
+              <div class="tab-content">
+                @for (inc of empleado.incidenciaDTO || []; track inc.id_Incidencia) {
+                  <div class="historial-item">
+                    <div class="historial-titulo">{{ inc.tipo }}</div>
+                    <div class="historial-sub">{{ inc.fecha }}</div>
+                    <div class="historial-desc">{{ inc.descripcion }}</div>
+                    <span class="severidad-badge" [class]="inc.severidad.toLowerCase()">
+                      {{ inc.severidad }}
+                    </span>
+                  </div>
+                }
+                @if (!empleado.incidenciaDTO || empleado.incidenciaDTO.length === 0) {
+                  <p class="sin-docs">Sin incidencias registradas</p>
+                }
+              </div>
+            </mat-tab>
+
+          </mat-tab-group>
+        </div>
+
+        <!-- Panel derecho — Info del empleado -->
+        <div class="panel-lateral">
+
+          <!-- Avatar y nombre -->
+          <div class="perfil-header">
+            <div class="avatar-grande">
+              {{ getIniciales(empleado.nombre + ' ' + empleado.apellidos) }}
+            </div>
+            <h3>{{ empleado.nombre }} {{ empleado.apellidos }}</h3>
+            <p class="perfil-cargo">{{ empleado.cargo }} · {{ empleado.area }}</p>
+            <p class="perfil-sucursal">
+              <mat-icon>location_on</mat-icon>
+              {{ empleado.sucursalNombre }}
+            </p>
+            <span class="estado-chip"
+                  [style.background]="getColorEstado(empleado.estadoEmpleado)">
+              {{ empleado.estadoEmpleado?.replace('_', ' ') }}
+            </span>
+          </div>
+
+          <!-- Estadísticas rápidas -->
+          <div class="perfil-stats">
+            <div class="pstat">
+              <span class="pstat-val">{{ empleado.documentoDTO?.length || 0 }}</span>
+              <span class="pstat-label">Docs</span>
+            </div>
+            <div class="pstat">
+              <span class="pstat-val">{{ empleado.incidenciaDTO?.length || 0 }}</span>
+              <span class="pstat-label">Incidencias</span>
+            </div>
+            <div class="pstat">
+              <span class="pstat-val">0</span>
+              <span class="pstat-label">Salidas</span>
+            </div>
+          </div>
+
+          <!-- Información personal -->
+          @if (!modoEdicion) {
+            <div class="info-personal">
+              <h4>INFORMACIÓN PERSONAL</h4>
+              <div class="info-row">
+                <span class="info-label">DNI</span>
+                <span>{{ empleado.dni }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Teléfono</span>
+                <span>{{ empleado.telefono || '—' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Email</span>
+                <span>{{ empleado.email || '—' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Dirección</span>
+                <span>{{ empleado.direccion || '—' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Contacto emergencia</span>
+                <span>{{ empleado.contactoEmergencia || '—' }}</span>
+              </div>
+
+              <button mat-raised-button class="btn-editar"
+                      (click)="modoEdicion = true">
+                Editar información
+              </button>
+            </div>
+          }
+
+          <!-- Formulario edición -->
+          @if (modoEdicion) {
+            <form [formGroup]="editForm" (ngSubmit)="guardarEdicion()" class="edit-form">
+              <h4>EDITAR INFORMACIÓN</h4>
+
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Nombres</mat-label>
+                <input matInput formControlName="nombres">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Apellidos</mat-label>
+                <input matInput formControlName="apellidos">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Teléfono</mat-label>
+                <input matInput formControlName="telefono">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Dirección</mat-label>
+                <input matInput formControlName="direccion">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Contacto emergencia</mat-label>
+                <input matInput formControlName="contactoEmergencia">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Estado</mat-label>
+                <mat-select formControlName="estado">
+                  <mat-option value="ACTIVO">Activo</mat-option>
+                  <mat-option value="INACTIVO">Inactivo</mat-option>
+                  <mat-option value="PERMISO">Permiso</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <div class="edit-btns">
+                <button mat-button type="button" (click)="modoEdicion = false">
+                  Cancelar
+                </button>
+                <button mat-raised-button class="btn-guardar" type="submit">
+                  Guardar
+                </button>
+              </div>
+            </form>
+          }
+
+        </div>
+
+      </div>
+    }
+
+  </main>
+</div>
