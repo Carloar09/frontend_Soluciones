@@ -1,1 +1,215 @@
-<p>incidencias works!</p>
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <mat-icon>business</mat-icon>
+      <span>RRHH</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon><span>Dashboard</span>
+      </a>
+      <a class="nav-item" routerLink="/sucursales">
+        <mat-icon>store</mat-icon><span>Sucursales</span>
+      </a>
+      <a class="nav-item" routerLink="/empleados">
+        <mat-icon>people</mat-icon><span>Empleados</span>
+      </a>
+      <a class="nav-item active" routerLink="/incidencias">
+        <mat-icon>warning</mat-icon><span>Incidencias</span>
+      </a>
+      <a class="nav-item" routerLink="/salidas">
+        <mat-icon>exit_to_app</mat-icon><span>Salidas</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="usuario-info">
+        <div class="avatar-usuario">{{ getIniciales(usuario?.nombre || 'U') }}</div>
+        <div>
+          <div class="usuario-nombre">{{ usuario?.nombre }}</div>
+          <div class="usuario-rol">{{ usuario?.rol?.replace('_', ' ') }}</div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido -->
+  <main class="main-content">
+
+    <h1 class="page-title">Incidencias</h1>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icono naranja"><mat-icon>warning</mat-icon></div>
+        <div>
+          <div class="stat-val">{{ stats.esteMes }}</div>
+          <div class="stat-lab">Este mes</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icono rojo"><mat-icon>report_problem</mat-icon></div>
+        <div>
+          <div class="stat-val">{{ stats.porResolver }}</div>
+          <div class="stat-lab">Por resolver</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icono naranja"><mat-icon>person</mat-icon></div>
+        <div>
+          <div class="stat-val" style="font-size:0.9rem">{{ stats.masIncidencias }}</div>
+          <div class="stat-lab">Más incidencias</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de incidencias recientes -->
+    <div class="card">
+      <h3 class="card-titulo">Incidencias recientes</h3>
+
+      @if (cargando) {
+        <div class="cargando"><mat-icon>hourglass_empty</mat-icon></div>
+      }
+
+      @if (!cargando) {
+        <div class="incidencias-lista">
+          @for (inc of incidencias; track inc.idIncidencia) {
+            <div class="incidencia-item" (click)="irAExpediente(inc.dniEmpleado)">
+              <div class="inc-avatar">{{ getIniciales(inc.nombreCompleto) }}</div>
+              <div class="inc-info">
+                <span class="inc-nombre">{{ inc.nombreCompleto }}</span>
+                <span class="inc-tipo">{{ inc.tipo }} · {{ inc.fecha }}</span>
+              </div>
+              <span class="severidad-badge"
+                    [style.background]="getColorSeveridad(inc.severidad)">
+                {{ inc.severidad }}
+              </span>
+            </div>
+          }
+          @if (incidencias.length === 0) {
+            <p class="sin-datos">Sin incidencias registradas</p>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Botón agregar -->
+    <button mat-fab class="btn-fab" (click)="mostrarFormulario = true">
+      <mat-icon>add</mat-icon>
+    </button>
+
+  </main>
+
+  <!-- Modal registro de incidencia -->
+  @if (mostrarFormulario) {
+    <div class="modal-overlay" (click)="mostrarFormulario = false">
+      <div class="modal" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+          <h2>Registro de Incidente</h2>
+          <button mat-icon-button (click)="mostrarFormulario = false">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Buscar empleado -->
+        @if (!empleadoEncontrado) {
+          <div class="buscar-empleado">
+            <p>Ingresa el DNI del empleado:</p>
+            <div class="buscar-row">
+              <input [(ngModel)]="dniBusqueda"
+                     placeholder="Ej: 47823651"
+                     class="input-dni"
+                     (keyup.enter)="buscarEmpleado()">
+              <button mat-raised-button class="btn-buscar"
+                      (click)="buscarEmpleado()"
+                      [disabled]="buscandoEmpleado">
+                {{ buscandoEmpleado ? 'Buscando...' : 'Buscar' }}
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Empleado encontrado -->
+        @if (empleadoEncontrado) {
+          <div class="empleado-encontrado">
+            <div class="emp-avatar">
+              {{ getIniciales(empleadoEncontrado.nombre + ' ' + empleadoEncontrado.apellidos) }}
+            </div>
+            <div>
+              <div class="emp-nombre">
+                {{ empleadoEncontrado.nombre }} {{ empleadoEncontrado.apellidos }}
+              </div>
+              <div class="emp-cargo">{{ empleadoEncontrado.cargo }} · {{ empleadoEncontrado.area }}</div>
+            </div>
+          </div>
+
+          <form [formGroup]="incidenciaForm" (ngSubmit)="registrarIncidencia()">
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Tipo</mat-label>
+                <mat-select formControlName="tipo">
+                  <mat-option value="Tardanza">Tardanza</mat-option>
+                  <mat-option value="Falta">Falta</mat-option>
+                  <mat-option value="Amonestación">Amonestación</mat-option>
+                  <mat-option value="Falta administrativa">Falta administrativa</mat-option>
+                  <mat-option value="Conducta">Conducta</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="field-half">
+                <mat-label>Fecha</mat-label>
+                <input matInput type="date" formControlName="fecha">
+              </mat-form-field>
+            </div>
+
+            <!-- Severidad como botones -->
+            <div class="severidad-row">
+              <span class="severidad-label">Severidad:</span>
+              <button type="button"
+                      [class.sel]="incidenciaForm.get('severidad')?.value === 'GRAVE'"
+                      class="sev-btn grave"
+                      (click)="incidenciaForm.patchValue({severidad: 'GRAVE'})">
+                ● Grave
+              </button>
+              <button type="button"
+                      [class.sel]="incidenciaForm.get('severidad')?.value === 'MODERADA'"
+                      class="sev-btn moderada"
+                      (click)="incidenciaForm.patchValue({severidad: 'MODERADA'})">
+                ● Moderada
+              </button>
+              <button type="button"
+                      [class.sel]="incidenciaForm.get('severidad')?.value === 'LEVE'"
+                      class="sev-btn leve"
+                      (click)="incidenciaForm.patchValue({severidad: 'LEVE'})">
+                ● Leve
+              </button>
+            </div>
+
+            <mat-form-field appearance="outline" class="field-full">
+              <mat-label>Descripción</mat-label>
+              <textarea matInput formControlName="descripcion"
+                        rows="3"
+                        placeholder="Describe los hechos relevantes...">
+              </textarea>
+            </mat-form-field>
+
+            <div class="modal-footer">
+              <button mat-raised-button class="btn-registrar" type="submit">
+                Registrar incidencia
+              </button>
+            </div>
+
+          </form>
+        }
+
+      </div>
+    </div>
+  }
+
+</div>

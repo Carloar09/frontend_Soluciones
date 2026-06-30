@@ -1,1 +1,256 @@
-<p>salidas works!</p>
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <mat-icon>business</mat-icon>
+      <span>RRHH</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon><span>Dashboard</span>
+      </a>
+      <a class="nav-item" routerLink="/sucursales">
+        <mat-icon>store</mat-icon><span>Sucursales</span>
+      </a>
+      <a class="nav-item" routerLink="/empleados">
+        <mat-icon>people</mat-icon><span>Empleados</span>
+      </a>
+      <a class="nav-item" routerLink="/incidencias">
+        <mat-icon>warning</mat-icon><span>Incidencias</span>
+      </a>
+      <a class="nav-item active" routerLink="/salidas">
+        <mat-icon>exit_to_app</mat-icon><span>Salidas</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="usuario-info">
+        <div class="avatar-usuario">{{ getIniciales(usuario?.nombre || 'U') }}</div>
+        <div>
+          <div class="usuario-nombre">{{ usuario?.nombre }}</div>
+          <div class="usuario-rol">{{ usuario?.rol?.replace('_', ' ') }}</div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido -->
+  <main class="main-content">
+
+    <div class="page-header">
+      <h1 class="page-title">Salidas</h1>
+      <div class="filtros">
+        <button class="filtro-btn activo">Todos</button>
+      </div>
+    </div>
+
+    @if (cargando) {
+      <div class="cargando">
+        <mat-icon>hourglass_empty</mat-icon>
+      </div>
+    }
+
+    @if (!cargando) {
+      <div class="tabla-container">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>EMPLEADO</th>
+              <th>FECHA SALIDA</th>
+              <th>TIEMPO</th>
+              <th>MOTIVO</th>
+              <th>DETALLE</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of salidas; track s.id_Salida) {
+              <tr>
+                <td>{{ s.nombreCompleto }}</td>
+                <td>{{ s.fechaSalida }}</td>
+                <td>{{ s.tiempoEmpresa }}</td>
+                <td>
+                  <span class="motivo-badge"
+                        [style.background]="getColorTipo(s.tipoSalida) + '20'"
+                        [style.color]="getColorTipo(s.tipoSalida)">
+                    {{ getTipoLabel(s.tipoSalida) }}
+                  </span>
+                </td>
+                <td>
+                  <button mat-button class="btn-info">Info</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (salidas.length === 0) {
+          <div class="sin-datos">
+            <mat-icon>exit_to_app</mat-icon>
+            <p>Sin salidas registradas</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- FAB -->
+    <button mat-fab class="btn-fab" (click)="mostrarFormulario = true">
+      <mat-icon>add</mat-icon>
+    </button>
+
+  </main>
+
+  <!-- Modal Registro de salida -->
+  @if (mostrarFormulario) {
+    <div class="modal-overlay" (click)="cerrarFormulario()">
+      <div class="modal" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+          <h2>Registro de salida</h2>
+          <button mat-icon-button (click)="cerrarFormulario()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Pasos -->
+        <div class="pasos">
+          <div class="paso-btn" [class.activo]="paso === 1">Paso 1</div>
+          <div class="paso-btn" [class.activo]="paso === 2">Paso 2</div>
+        </div>
+
+        <!-- PASO 1 -->
+        @if (paso === 1) {
+          <form [formGroup]="salidaForm">
+
+            <!-- Buscar empleado -->
+            @if (!empleadoEncontrado) {
+              <div class="buscar-empleado">
+                <p>Ingresa el DNI del empleado:</p>
+                <div class="buscar-row">
+                  <input [(ngModel)]="dniBusqueda"
+                         [ngModelOptions]="{standalone: true}"
+                         placeholder="Ej: 47823651"
+                         class="input-dni"
+                         (keyup.enter)="buscarEmpleado()">
+                  <button mat-raised-button class="btn-buscar"
+                          type="button"
+                          (click)="buscarEmpleado()"
+                          [disabled]="buscandoEmpleado">
+                    {{ buscandoEmpleado ? 'Buscando...' : 'Buscar' }}
+                  </button>
+                </div>
+              </div>
+            }
+
+            <!-- Empleado encontrado -->
+            @if (empleadoEncontrado) {
+              <div class="empleado-card">
+                <div class="emp-avatar">
+                  {{ getIniciales(empleadoEncontrado.nombre + ' ' + empleadoEncontrado.apellidos) }}
+                </div>
+                <div>
+                  <div class="emp-nombre">
+                    {{ empleadoEncontrado.nombre }} {{ empleadoEncontrado.apellidos }}
+                  </div>
+                  <div class="emp-cargo">
+                    {{ empleadoEncontrado.cargo }} · {{ empleadoEncontrado.area }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="field-half">
+                  <mat-label>Tipo de salida</mat-label>
+                  <mat-select formControlName="tipoSalida">
+                    <mat-option value="RENUNCIA_VOLUNTARIA">Renuncia voluntaria</mat-option>
+                    <mat-option value="FIN_DE_CONTRATO">Fin de contrato</mat-option>
+                    <mat-option value="CESE">Cese</mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="field-half">
+                  <mat-label>Fecha de salida</mat-label>
+                  <input matInput type="date" formControlName="fechaSalida">
+                </mat-form-field>
+              </div>
+
+              <div class="modal-footer">
+                <button mat-raised-button class="btn-siguiente"
+                        type="button"
+                        (click)="siguientePaso()">
+                  Siguiente
+                </button>
+              </div>
+            }
+
+          </form>
+        }
+
+        <!-- PASO 2 -->
+        @if (paso === 2) {
+          <div>
+
+            <!-- Empleado -->
+            <div class="empleado-card">
+              <div class="emp-avatar">
+                {{ getIniciales(empleadoEncontrado.nombre + ' ' + empleadoEncontrado.apellidos) }}
+              </div>
+              <div>
+                <div class="emp-nombre">
+                  {{ empleadoEncontrado.nombre }} {{ empleadoEncontrado.apellidos }}
+                </div>
+                <div class="emp-cargo">{{ getTipoLabel(salidaForm.get('tipoSalida')?.value) }}</div>
+              </div>
+            </div>
+
+            <div class="paso2-grid">
+
+              <!-- Observaciones -->
+              <mat-form-field appearance="outline" class="field-full">
+                <mat-label>Observaciones</mat-label>
+                <textarea matInput [formControl]="$any(salidaForm.get('observaciones'))"
+                          rows="3">
+                </textarea>
+              </mat-form-field>
+
+              <!-- Checklist pendientes -->
+              <div class="checklist-box">
+                <h4>Pendientes antes de la salida</h4>
+                <label class="check-row">
+                  <input type="checkbox" [(ngModel)]="pendientes.cartaRecibida">
+                  <span>Carta de renuncia recibida</span>
+                </label>
+                <label class="check-row">
+                  <input type="checkbox" [(ngModel)]="pendientes.devolucionMateriales">
+                  <span>Devolución de materiales verificada</span>
+                </label>
+                <label class="check-row">
+                  <input type="checkbox" [(ngModel)]="pendientes.liquidacionFirmada">
+                  <span>Liquidación calculada y firmada</span>
+                </label>
+              </div>
+
+            </div>
+
+            <div class="alerta-exempleado">
+              Esta acción cambiará el estado del empleado a EX EMPLEADO
+            </div>
+
+            <div class="modal-footer">
+              <button mat-button (click)="paso = 1">Cancelar</button>
+              <button mat-raised-button class="btn-confirmar"
+                      (click)="confirmarSalida()">
+                Confirmar y Registrar Salida
+              </button>
+            </div>
+
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+
+</div>
