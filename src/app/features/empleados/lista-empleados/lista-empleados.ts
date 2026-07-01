@@ -119,8 +119,8 @@ export class ListaEmpleados implements OnInit {
   }
 
   nuevoEmpleado(): void {
-    this.router.navigate(['/empleados/expediente', 'nuevo']);
-  }
+  this.router.navigate(['/empleados/nuevo-empleado']);
+}
 
   logout(): void {
     localStorage.removeItem('token');

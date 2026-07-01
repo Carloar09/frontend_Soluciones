@@ -1,0 +1,206 @@
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <mat-icon>business</mat-icon>
+      <span>RRHH</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon><span>Dashboard</span>
+      </a>
+      <a class="nav-item" routerLink="/sucursales">
+        <mat-icon>store</mat-icon><span>Sucursales</span>
+      </a>
+      <a class="nav-item active" routerLink="/empleados">
+        <mat-icon>people</mat-icon><span>Empleados</span>
+      </a>
+      <a class="nav-item" routerLink="/busqueda">
+        <mat-icon>search</mat-icon><span>Búsqueda</span>
+      </a>
+      <a class="nav-item" routerLink="/incidencias">
+        <mat-icon>warning</mat-icon><span>Incidencias</span>
+      </a>
+      <a class="nav-item" routerLink="/salidas">
+        <mat-icon>exit_to_app</mat-icon><span>Salidas</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="usuario-info">
+        <div class="avatar-usuario">{{ getIniciales(usuario?.nombre || 'U') }}</div>
+        <div>
+          <div class="usuario-nombre">{{ usuario?.nombre }}</div>
+          <div class="usuario-rol">{{ usuario?.rol?.replace('_', ' ') }}</div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido -->
+  <main class="main-content">
+
+    <div class="back-btn" routerLink="/empleados">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Volver a Empleados</span>
+    </div>
+
+    <h1 class="page-title">Registrar Nuevo Empleado</h1>
+
+    <form [formGroup]="empleadoForm" (ngSubmit)="guardar()">
+      <div class="form-grid">
+
+        <!-- Columna izquierda -->
+        <div class="card">
+          <h3 class="seccion-titulo">Información Personal</h3>
+
+          <div class="fila-doble">
+            <mat-form-field appearance="outline" class="field">
+              <mat-label>DNI *</mat-label>
+              <input matInput formControlName="dni" maxlength="8" placeholder="12345678">
+              @if (empleadoForm.get('dni')?.hasError('required') && empleadoForm.get('dni')?.touched) {
+                <mat-error>DNI obligatorio</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="field">
+              <mat-label>Estado</mat-label>
+              <mat-select formControlName="estado">
+                <mat-option value="ACTIVO">Activo</mat-option>
+                <mat-option value="INACTIVO">Inactivo</mat-option>
+                <mat-option value="PERMISO">Permiso</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="fila-doble">
+            <mat-form-field appearance="outline" class="field">
+              <mat-label>Nombres *</mat-label>
+              <input matInput formControlName="nombres">
+              @if (empleadoForm.get('nombres')?.hasError('required') && empleadoForm.get('nombres')?.touched) {
+                <mat-error>Nombres obligatorios</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="field">
+              <mat-label>Apellidos *</mat-label>
+              <input matInput formControlName="apellidos">
+              @if (empleadoForm.get('apellidos')?.hasError('required') && empleadoForm.get('apellidos')?.touched) {
+                <mat-error>Apellidos obligatorios</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono" placeholder="+51 999 999 999">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Dirección</mat-label>
+            <input matInput formControlName="direccion">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Contacto de emergencia</mat-label>
+            <input matInput formControlName="contactoEmergencia"
+                   placeholder="Nombre · Teléfono">
+          </mat-form-field>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="card">
+          <h3 class="seccion-titulo">Información Laboral</h3>
+
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Sucursal *</mat-label>
+            <mat-select formControlName="sucursalId">
+              @for (s of sucursales; track s.idSucursal) {
+                <mat-option [value]="s.idSucursal">{{ s.nombre }}</mat-option>
+              }
+            </mat-select>
+            @if (empleadoForm.get('sucursalId')?.hasError('required') && empleadoForm.get('sucursalId')?.touched) {
+              <mat-error>Sucursal obligatoria</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="fila-doble">
+            <mat-form-field appearance="outline" class="field">
+              <mat-label>Área *</mat-label>
+              <input matInput formControlName="area" placeholder="Ej: Librería">
+              @if (empleadoForm.get('area')?.hasError('required') && empleadoForm.get('area')?.touched) {
+                <mat-error>Área obligatoria</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="field">
+              <mat-label>Cargo *</mat-label>
+              <input matInput formControlName="cargo" placeholder="Ej: Vendedor">
+              @if (empleadoForm.get('cargo')?.hasError('required') && empleadoForm.get('cargo')?.touched) {
+                <mat-error>Cargo obligatorio</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="fila-doble">
+            <mat-form-field appearance="outline" class="field">
+              <mat-label>Fecha de ingreso *</mat-label>
+              <input matInput type="date" formControlName="fechaIngreso">
+              @if (empleadoForm.get('fechaIngreso')?.hasError('required') && empleadoForm.get('fechaIngreso')?.touched) {
+                <mat-error>Fecha obligatoria</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="field">
+              <mat-label>Fecha de vencimiento</mat-label>
+              <input matInput type="date" formControlName="fechaVencimiento">
+            </mat-form-field>
+          </div>
+
+          <!-- Preview del empleado -->
+          <div class="preview-empleado">
+            <div class="preview-avatar">
+              {{ getIniciales((empleadoForm.get('nombres')?.value || '') + ' ' + (empleadoForm.get('apellidos')?.value || '')) }}
+            </div>
+            <div class="preview-info">
+              <div class="preview-nombre">
+                {{ empleadoForm.get('nombres')?.value || 'Nombres' }}
+                {{ empleadoForm.get('apellidos')?.value || 'Apellidos' }}
+              </div>
+              <div class="preview-cargo">
+                {{ empleadoForm.get('cargo')?.value || 'Cargo' }} ·
+                {{ empleadoForm.get('area')?.value || 'Área' }}
+              </div>
+              <div class="preview-dni">
+                DNI: {{ empleadoForm.get('dni')?.value || '--------' }}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Botones -->
+      <div class="form-footer">
+        <button mat-button type="button" routerLink="/empleados">
+          Cancelar
+        </button>
+        <button mat-raised-button class="btn-guardar"
+                type="submit" [disabled]="cargando">
+          {{ cargando ? 'Registrando...' : 'Registrar Empleado' }}
+        </button>
+      </div>
+
+    </form>
+
+  </main>
+</div>

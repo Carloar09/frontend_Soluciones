@@ -44,6 +44,18 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+  path: 'empleados/nuevo-empleado',
+  loadComponent: () =>
+    import('./features/empleados/nuevo-empleado').then(m => m.NuevoEmpleado),   
+  canActivate: [authGuard]
+  },
+  {
+  path: 'busqueda',
+  loadComponent: () =>
+    import('./features/busqueda/busqueda').then(m => m.Busqueda),
+  canActivate: [authGuard]
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
@@ -51,6 +63,5 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'login'
-  }
-  
+  },
 ];

@@ -1,0 +1,142 @@
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <mat-icon>business</mat-icon>
+      <span>RRHH</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" routerLink="/dashboard">
+        <mat-icon>dashboard</mat-icon><span>Dashboard</span>
+      </a>
+      <a class="nav-item" routerLink="/sucursales">
+        <mat-icon>store</mat-icon><span>Sucursales</span>
+      </a>
+      <a class="nav-item" routerLink="/empleados">
+        <mat-icon>people</mat-icon><span>Empleados</span>
+      </a>
+      <a class="nav-item active" routerLink="/busqueda">
+        <mat-icon>search</mat-icon><span>Búsqueda</span>
+      </a>
+      <a class="nav-item" routerLink="/incidencias">
+        <mat-icon>warning</mat-icon><span>Incidencias</span>
+      </a>
+      <a class="nav-item" routerLink="/salidas">
+        <mat-icon>exit_to_app</mat-icon><span>Salidas</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="usuario-info">
+        <div class="avatar-usuario">{{ getIniciales(usuario?.nombre || 'U') }}</div>
+        <div>
+          <div class="usuario-nombre">{{ usuario?.nombre }}</div>
+          <div class="usuario-rol">{{ usuario?.rol?.replace('_', ' ') }}</div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Contenido -->
+  <main class="main-content">
+
+    <h1 class="page-title">Búsqueda por DNI</h1>
+
+    <!-- Buscador -->
+    <div class="buscador-card">
+      <div class="buscador-row">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          [(ngModel)]="dniBusqueda"
+          placeholder="Ingresa el DNI del empleado o postulante..."
+          class="input-busqueda"
+          (keyup.enter)="buscar()"
+          maxlength="8">
+        <button mat-raised-button class="btn-buscar"
+                (click)="buscar()"
+                [disabled]="buscando || !dniBusqueda.trim()">
+          {{ buscando ? 'Buscando...' : 'Buscar' }}
+        </button>
+      </div>
+      <p class="busqueda-hint">
+        Puedes buscar empleados activos, históricos y ex trabajadores.
+      </p>
+    </div>
+
+    <!-- Resultado encontrado -->
+    @if (buscado && empleadoEncontrado) {
+      <div class="resultado-card">
+
+        <div class="resultado-izq">
+          <div class="emp-avatar">
+            {{ getIniciales(empleadoEncontrado.nombre + ' ' + empleadoEncontrado.apellidos) }}
+          </div>
+          <div class="emp-datos">
+            <h3>{{ empleadoEncontrado.nombre }} {{ empleadoEncontrado.apellidos }}</h3>
+            <div class="emp-meta">
+              <span>DNI: {{ empleadoEncontrado.dni }}</span>
+              <span>Área: {{ empleadoEncontrado.area }}</span>
+              <span class="estado-chip"
+                    [style.background]="getColorEstado(empleadoEncontrado.estadoEmpleado) + '20'"
+                    [style.color]="getColorEstado(empleadoEncontrado.estadoEmpleado)">
+                ● {{ empleadoEncontrado.estadoEmpleado?.replace('_', ' ') }}
+              </span>
+            </div>
+            @if (empleadoEncontrado.sucursalNombre) {
+              <div class="emp-sucursal">
+                <mat-icon>location_on</mat-icon>
+                Sucursal: {{ empleadoEncontrado.sucursalNombre }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="resultado-der">
+          @if (empleadoEncontrado.cargo) {
+            <div class="dato-col">
+              <span class="dato-label">Cargo</span>
+              <span class="dato-val">{{ empleadoEncontrado.cargo }}</span>
+            </div>
+          }
+          @if (empleadoEncontrado.fechaIngreso) {
+            <div class="dato-col">
+              <span class="dato-label">Fecha ingreso</span>
+              <span class="dato-val">{{ empleadoEncontrado.fechaIngreso }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Acciones -->
+        <div class="resultado-acciones">
+          <button mat-raised-button class="btn-expediente"
+                  (click)="verExpediente()">
+            Ver Expediente
+          </button>
+          <button mat-stroked-button class="btn-incidencia"
+                  (click)="registrarIncidencia()">
+            Registrar Incidencia
+          </button>
+          @if (empleadoEncontrado.estadoEmpleado === 'ACTIVO') {
+            <button mat-raised-button class="btn-salida"
+                    (click)="iniciarSalida()">
+              Iniciar Salida
+            </button>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- No encontrado -->
+    @if (buscado && !empleadoEncontrado) {
+      <div class="no-encontrado">
+        <mat-icon>person_off</mat-icon>
+        <p>No se encontró ningún empleado con el DNI <strong>{{ dniBusqueda }}</strong></p>
+      </div>
+    }
+
+  </main>
+</div>
