@@ -6,35 +6,29 @@
       <mat-icon>business</mat-icon>
       <span>RRHH</span>
     </div>
-
     <nav class="sidebar-nav">
       <a class="nav-item" routerLink="/dashboard">
-        <mat-icon>dashboard</mat-icon>
-        <span>Dashboard</span>
+        <mat-icon>dashboard</mat-icon><span>Dashboard</span>
       </a>
       <a class="nav-item active" routerLink="/sucursales">
-        <mat-icon>store</mat-icon>
-        <span>Sucursales</span>
+        <mat-icon>store</mat-icon><span>Sucursales</span>
+      </a>
+      <a class="nav-item" routerLink="/busqueda">
+        <mat-icon>search</mat-icon><span>Búsqueda</span>
       </a>
       <a class="nav-item" routerLink="/empleados">
-        <mat-icon>people</mat-icon>
-        <span>Empleados</span>
+        <mat-icon>people</mat-icon><span>Empleados</span>
       </a>
       <a class="nav-item" routerLink="/incidencias">
-        <mat-icon>warning</mat-icon>
-        <span>Incidencias</span>
+        <mat-icon>warning</mat-icon><span>Incidencias</span>
       </a>
       <a class="nav-item" routerLink="/salidas">
-        <mat-icon>exit_to_app</mat-icon>
-        <span>Salidas</span>
+        <mat-icon>exit_to_app</mat-icon><span>Salidas</span>
       </a>
     </nav>
-
     <div class="sidebar-footer">
       <div class="usuario-info">
-        <div class="avatar-usuario">
-          {{ getIniciales(usuario?.nombre || 'U') }}
-        </div>
+        <div class="avatar-usuario">{{ getIniciales(usuario?.nombre || 'U') }}</div>
         <div>
           <div class="usuario-nombre">{{ usuario?.nombre }}</div>
           <div class="usuario-rol">{{ usuario?.rol?.replace('_', ' ') }}</div>
@@ -49,7 +43,13 @@
   <!-- Contenido -->
   <main class="main-content">
 
-    <h1 class="page-title">Sucursales</h1>
+    <div class="page-header">
+      <h1 class="page-title">Sucursales</h1>
+      <button mat-raised-button class="btn-nueva" (click)="mostrarModal = true">
+        <mat-icon>add</mat-icon>
+        Nueva Sucursal
+      </button>
+    </div>
 
     @if (cargando) {
       <div class="cargando">
@@ -71,9 +71,14 @@
                   Operativa
                 </div>
               </div>
-              <span class="badge-empleados">
-                {{ s.totalEmpleados || 0 }} empleados
-              </span>
+              <div class="header-right">
+                <span class="badge-empleados">{{ s.totalEmpleados }} empleados</span>
+                <button mat-icon-button class="btn-eliminar"
+                        (click)="confirmarEliminar(s)"
+                        title="Eliminar sucursal">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </div>
 
             <div class="sucursal-info">
@@ -81,25 +86,19 @@
                 <mat-icon>location_on</mat-icon>
                 <span>{{ s.ubicacion }}</span>
               </div>
-              @if (s.encargadoNombre) {
-                <div class="info-row">
-                  <mat-icon>person</mat-icon>
-                  <span>{{ s.encargadoNombre }}</span>
-                </div>
-              }
             </div>
 
             <div class="sucursal-stats">
               <div class="mini-stat">
-                <span class="mini-valor">{{ s.activos || 0 }}</span>
+                <span class="mini-valor">{{ s.activos }}</span>
                 <span class="mini-label">Activos</span>
               </div>
               <div class="mini-stat">
-                <span class="mini-valor">{{ s.incidencias || 0 }}</span>
+                <span class="mini-valor">{{ s.incidencias }}</span>
                 <span class="mini-label">Incidencias</span>
               </div>
               <div class="mini-stat">
-                <span class="mini-valor">{{ s.docsPendientes || 0 }}</span>
+                <span class="mini-valor">{{ s.docsPendientes }}</span>
                 <span class="mini-label">Docs pend.</span>
               </div>
             </div>
@@ -122,4 +121,83 @@
     }
 
   </main>
+
+  <!-- Modal crear sucursal -->
+  @if (mostrarModal) {
+    <div class="modal-overlay" (click)="mostrarModal = false">
+      <div class="modal" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+          <h2>Nueva Sucursal</h2>
+          <button mat-icon-button (click)="mostrarModal = false">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <form [formGroup]="sucursalForm" (ngSubmit)="crearSucursal()">
+
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Nombre de la sucursal *</mat-label>
+            <mat-icon matPrefix>store</mat-icon>
+            <input matInput formControlName="nombre"
+                   placeholder="Ej: Sucursal Norte">
+            @if (sucursalForm.get('nombre')?.hasError('required') && sucursalForm.get('nombre')?.touched) {
+              <mat-error>El nombre es obligatorio</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="field-full">
+            <mat-label>Ubicación *</mat-label>
+            <mat-icon matPrefix>location_on</mat-icon>
+            <input matInput formControlName="ubicacion"
+                   placeholder="Ej: Jr. Comercio 245, Cajamarca">
+            @if (sucursalForm.get('ubicacion')?.hasError('required') && sucursalForm.get('ubicacion')?.touched) {
+              <mat-error>La ubicación es obligatoria</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="modal-footer">
+            <button mat-button type="button" (click)="mostrarModal = false">
+              Cancelar
+            </button>
+            <button mat-raised-button class="btn-crear"
+                    type="submit" [disabled]="guardando">
+              {{ guardando ? 'Creando...' : 'Crear Sucursal' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Modal confirmar eliminar -->
+  @if (mostrarConfirmarEliminar) {
+    <div class="modal-overlay" (click)="mostrarConfirmarEliminar = false">
+      <div class="modal modal-pequeño" (click)="$event.stopPropagation()">
+
+        <div class="eliminar-icono">
+          <mat-icon>warning</mat-icon>
+        </div>
+
+        <h2 class="eliminar-titulo">¿Eliminar sucursal?</h2>
+        <p class="eliminar-desc">
+          Estás a punto de eliminar <strong>{{ sucursalAEliminar?.nombre }}</strong>.
+          Esta acción no se puede deshacer.
+        </p>
+
+        <div class="modal-footer">
+          <button mat-button (click)="mostrarConfirmarEliminar = false">
+            Cancelar
+          </button>
+          <button mat-raised-button class="btn-eliminar-confirm"
+                  (click)="eliminarSucursal()">
+            Sí, eliminar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
 </div>
