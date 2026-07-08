@@ -49,7 +49,7 @@ export class ListaEmpleados implements OnInit {
   }
 
   cargarSucursales(): void {
-    this.http.get<any[]>('http://localhost:8080/api/v1/sucursales').subscribe({
+    this.http.get<any[]>('https://tarea-soluciones-2.onrender.com/api/v1/sucursales').subscribe({
       next: (data) => this.sucursales = data,
       error: () => {}
     });
@@ -58,8 +58,8 @@ export class ListaEmpleados implements OnInit {
   cargarEmpleados(): void {
     this.cargando = true;
     const url = this.sucursalId
-      ? `http://localhost:8080/api/v1/empleados?sucursalId=${this.sucursalId}`
-      : 'http://localhost:8080/api/v1/empleados';
+      ? `https://tarea-soluciones-2.onrender.com/api/v1/empleados?sucursalId=${this.sucursalId}`
+      : 'https://tarea-soluciones-2.onrender.com/api/v1/empleados';
 
     this.http.get<any[]>(url).subscribe({
       next: (data) => {

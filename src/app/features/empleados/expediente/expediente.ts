@@ -78,7 +78,7 @@ export class Expediente implements OnInit {
 
   cargarExpediente(): void {
     this.cargando = true;
-    this.http.get<any>(`http://localhost:8080/api/v1/empleados/expediente/${this.dni}`)
+    this.http.get<any>(`https://tarea-soluciones-2.onrender.com/api/v1/empleados/expediente/${this.dni}`)
       .subscribe({
         next: (data) => {
           this.empleado = data;
@@ -113,7 +113,7 @@ export class Expediente implements OnInit {
       fechaVencimiento: this.empleado.fechaVencimiento
     };
 
-    this.http.put<any>(`http://localhost:8080/api/v1/empleados/${this.empleado.id}`, body)
+    this.http.put<any>(`https://tarea-soluciones-2.onrender.com/api/v1/empleados/${this.empleado.id}`, body)
       .subscribe({
         next: () => {
           this.modoEdicion = false;
@@ -139,7 +139,7 @@ export class Expediente implements OnInit {
     formData.append('tipoDocumento', this.tipoDocumento);
     formData.append('archivo', this.archivoSeleccionado);
 
-    this.http.post<any>('http://localhost:8080/api/v1/documentos/subir', formData)
+    this.http.post<any>('https://tarea-soluciones-2.onrender.com/api/v1/documentos/subir', formData)
       .subscribe({
         next: () => {
           this.subiendoDoc = false;
@@ -155,7 +155,7 @@ export class Expediente implements OnInit {
   }
 
   eliminarDocumento(idDocumento: number): void {
-    this.http.delete(`http://localhost:8080/api/v1/documentos/${idDocumento}`)
+    this.http.delete(`https://tarea-soluciones-2.onrender.com/api/v1/documentos/${idDocumento}`)
       .subscribe({
         next: () => {
           this.cargarExpediente();
@@ -168,7 +168,7 @@ export class Expediente implements OnInit {
   }
 
   descargarDocumento(idDocumento: number, nombreArchivo: string): void {
-    this.http.get(`http://localhost:8080/api/v1/documentos/${idDocumento}/descargar`,
+    this.http.get(`https://tarea-soluciones-2.onrender.com/api/v1/documentos/${idDocumento}/descargar`,
       { responseType: 'blob' })
       .subscribe({
         next: (blob) => {

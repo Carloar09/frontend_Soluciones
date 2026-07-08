@@ -71,7 +71,7 @@ export class Incidencias implements OnInit {
 
   cargarIncidencias(): void {
     this.cargando = true;
-    this.http.get<any[]>('http://localhost:8080/api/v1/incidencias').subscribe({
+    this.http.get<any[]>('https://tarea-soluciones-2.onrender.com/api/v1/incidencias').subscribe({
       next: (data) => {
         this.incidencias = data;
         this.calcularStats();
@@ -108,7 +108,7 @@ export class Incidencias implements OnInit {
     if (!this.dniBusqueda) return;
     this.buscandoEmpleado = true;
 
-    this.http.get<any>(`http://localhost:8080/api/v1/empleados/expediente/${this.dniBusqueda}`)
+    this.http.get<any>(`https://tarea-soluciones-2.onrender.com/api/v1/empleados/expediente/${this.dniBusqueda}`)
       .subscribe({
         next: (data) => {
           this.empleadoEncontrado = data;
@@ -125,7 +125,7 @@ export class Incidencias implements OnInit {
   registrarIncidencia(): void {
     if (this.incidenciaForm.invalid) return;
 
-    this.http.post<any>('http://localhost:8080/api/v1/incidencias', this.incidenciaForm.value)
+    this.http.post<any>('https://tarea-soluciones-2.onrender.com/api/v1/incidencias', this.incidenciaForm.value)
       .subscribe({
         next: () => {
           this.mostrarFormulario = false;

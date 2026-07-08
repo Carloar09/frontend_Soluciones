@@ -56,7 +56,7 @@ export class Dashboard implements OnInit {
   }
 
   cargarSucursales(): void {
-    this.http.get<any[]>('http://localhost:8080/api/v1/sucursales').subscribe({
+    this.http.get<any[]>('https://tarea-soluciones-2.onrender.com/api/v1/sucursales').subscribe({
       next: (data) => this.sucursales = data,
       error: () => {}
     });
@@ -65,8 +65,8 @@ export class Dashboard implements OnInit {
   cargarDashboard(): void {
     this.cargando = true;
     const url = this.sucursalSeleccionada
-      ? `http://localhost:8080/api/v1/dashboard?sucursalId=${this.sucursalSeleccionada}`
-      : 'http://localhost:8080/api/v1/dashboard';
+      ? `https://tarea-soluciones-2.onrender.com/api/v1/dashboard?sucursalId=${this.sucursalSeleccionada}`
+      : 'https://tarea-soluciones-2.onrender.com/api/v1/dashboard';
 
     this.http.get<any>(url).subscribe({
       next: (data) => {

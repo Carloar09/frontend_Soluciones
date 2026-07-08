@@ -60,7 +60,7 @@ export class Sucursales implements OnInit {
 
   cargarSucursales(): void {
     this.cargando = true;
-    this.http.get<any[]>('http://localhost:8080/api/v1/sucursales').subscribe({
+    this.http.get<any[]>('https://tarea-soluciones-2.onrender.com/api/v1/sucursales').subscribe({
       next: (data) => {
         this.sucursales = data;
         this.cargando = false;
@@ -79,7 +79,7 @@ export class Sucursales implements OnInit {
       encargadoId: null
     };
 
-    this.http.post<any>('http://localhost:8080/api/v1/sucursales', body).subscribe({
+    this.http.post<any>('https://tarea-soluciones-2.onrender.com/api/v1/sucursales', body).subscribe({
       next: () => {
         this.guardando = false;
         this.mostrarModal = false;
@@ -102,7 +102,7 @@ export class Sucursales implements OnInit {
   eliminarSucursal(): void {
     if (!this.sucursalAEliminar) return;
 
-    this.http.delete(`http://localhost:8080/api/v1/sucursales/${this.sucursalAEliminar.idSucursal}`)
+    this.http.delete(`https://tarea-soluciones-2.onrender.com/api/v1/sucursales/${this.sucursalAEliminar.idSucursal}`)
       .subscribe({
         next: () => {
           this.mostrarConfirmarEliminar = false;

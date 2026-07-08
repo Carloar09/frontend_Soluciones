@@ -57,7 +57,7 @@ export class Login {
     if (this.loginForm.invalid) return;
     this.cargando = true;
 
-    this.http.post<any>('http://localhost:8080/api/v1/auth/login', this.loginForm.value)
+    this.http.post<any>('https://tarea-soluciones-2.onrender.com/api/v1/auth/login', this.loginForm.value)
       .subscribe({
         next: (response) => {
           localStorage.setItem('token', response.token);
@@ -83,7 +83,7 @@ export class Login {
     if (this.registerForm.invalid) return;
     this.cargando = true;
 
-    this.http.post<any>('http://localhost:8080/api/v1/auth/register', this.registerForm.value)
+    this.http.post<any>('https://tarea-soluciones-2.onrender.com/api/v1/auth/register', this.registerForm.value)
       .subscribe({
         next: (response) => {
           localStorage.setItem('token', response.token);

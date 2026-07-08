@@ -43,7 +43,7 @@ export class Busqueda {
     this.empleadoEncontrado = null;
     this.buscado = false;
 
-    this.http.get<any>(`http://localhost:8080/api/v1/empleados/expediente/${this.dniBusqueda.trim()}`)
+    this.http.get<any>(`https://tarea-soluciones-2.onrender.com/api/v1/empleados/expediente/${this.dniBusqueda.trim()}`)
       .subscribe({
         next: (data) => {
           this.empleadoEncontrado = data;

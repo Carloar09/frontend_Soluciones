@@ -71,7 +71,7 @@ export class Salidas implements OnInit {
 
   cargarSalidas(): void {
     this.cargando = true;
-    this.http.get<any[]>('http://localhost:8080/api/v1/salidas').subscribe({
+    this.http.get<any[]>('https://tarea-soluciones-2.onrender.com/api/v1/salidas').subscribe({
       next: (data) => {
         this.salidas = data;
         this.cargando = false;
@@ -84,7 +84,7 @@ export class Salidas implements OnInit {
     if (!this.dniBusqueda) return;
     this.buscandoEmpleado = true;
 
-    this.http.get<any>(`http://localhost:8080/api/v1/empleados/expediente/${this.dniBusqueda}`)
+    this.http.get<any>(`https://tarea-soluciones-2.onrender.com/api/v1/empleados/expediente/${this.dniBusqueda}`)
       .subscribe({
         next: (data) => {
           this.empleadoEncontrado = data;
@@ -112,7 +112,7 @@ export class Salidas implements OnInit {
       liquidacionFirmada: this.pendientes.liquidacionFirmada
     };
 
-    this.http.post<any>('http://localhost:8080/api/v1/salidas', body).subscribe({
+    this.http.post<any>('https://tarea-soluciones-2.onrender.com/api/v1/salidas', body).subscribe({
       next: () => {
         this.cerrarFormulario();
         this.cargarSalidas();

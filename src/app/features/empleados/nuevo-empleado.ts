@@ -65,7 +65,7 @@ export class NuevoEmpleado implements OnInit {
   }
 
   cargarSucursales(): void {
-    this.http.get<any[]>('http://localhost:8080/api/v1/sucursales').subscribe({
+    this.http.get<any[]>('https://tarea-soluciones-2.onrender.com/api/v1/sucursales').subscribe({
       next: (data) => this.sucursales = data,
       error: () => {}
     });
@@ -78,7 +78,7 @@ export class NuevoEmpleado implements OnInit {
     }
 
     this.cargando = true;
-    this.http.post<any>('http://localhost:8080/api/v1/empleados', this.empleadoForm.value)
+    this.http.post<any>('https://tarea-soluciones-2.onrender.com/api/v1/empleados', this.empleadoForm.value)
       .subscribe({
         next: (data) => {
           this.snackBar.open('Empleado registrado correctamente', 'Cerrar', { duration: 2000 });
