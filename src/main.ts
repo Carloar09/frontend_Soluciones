@@ -1,7 +1,17 @@
 import 'zone.js';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
-import {  App } from './app/app';
+import { provideServiceWorker } from '@angular/service-worker';
 
-bootstrapApplication(App, appConfig)
-  .catch((err) => console.error(err));
+import { appConfig } from './app/app.config';
+import { App } from './app/app';
+
+bootstrapApplication(App, {
+  ...appConfig,
+  providers: [
+    ...(appConfig.providers ?? []),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: true,
+      registrationStrategy: 'registerWhenStable:30000'
+    })
+  ]
+}).catch((err) => console.error(err));
